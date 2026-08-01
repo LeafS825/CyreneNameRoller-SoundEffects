@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>音效</title>
+  <style>
+    :root { color-scheme: light dark; font-family: "Segoe UI Variable", system-ui, sans-serif; }
+    body { margin: 0; padding: 24px; color: CanvasText; background: Canvas; }
+    h1 { margin: 0 0 6px; font-size: 24px; }
+    p { color: GrayText; font-size: 13px; line-height: 1.5; }
+    .card { max-width: 720px; padding: 18px; border: 1px solid color-mix(in srgb, CanvasText 20%, transparent); border-radius: 14px; background: color-mix(in srgb, Canvas 88%, CanvasText 12%); }
+    .row { display: grid; grid-template-columns: 150px 1fr auto; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, CanvasText 14%, transparent); }
+    .row:last-child { border-bottom: 0; }
+    label { font-size: 13px; }
+    button, select, input { font: inherit; }
+    button { border: 1px solid color-mix(in srgb, CanvasText 24%, transparent); border-radius: 8px; padding: 7px 10px; cursor: pointer; background: color-mix(in srgb, Canvas 82%, CanvasText 18%); color: inherit; }
+    button:hover { background: color-mix(in srgb, Canvas 70%, CanvasText 30%); }
+    .file-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: GrayText; font-size: 12px; }
+    .status { min-height: 20px; color: GrayText; font-size: 12px; }
+    @media (max-width: 560px) { .row { grid-template-columns: 1fr; gap: 7px; } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>音效</h1>
+    <p>为随机点名、翻牌点名和抽奖选择本地音频。音频只保存在本机插件数据中。</p>
+    <div class="row"><label for="enabled">启用音效</label><span></span><input id="enabled" type="checkbox"></div>
+    <div class="row"><label for="volume">音量</label><input id="volume" type="range" min="0" max="1" step="0.01"><output id="volumeValue">70%</output></div>
+    <div class="row"><label for="playbackMode">播放逻辑</label><select id="playbackMode"><option value="once">每次操作播放一次</option><option value="each">每次结果都播放</option></select><span></span></div>
+    <div class="row"><label>随机点名</label><span class="file-name" id="rollerName">未选择</span><button data-kind="roller">选择音频</button></div>
+    <div class="row"><label>翻牌点名</label><span class="file-name" id="cardName">未选择</span><button data-kind="card">选择音频</button></div>
+    <div class="row"><label>抽奖</label><span class="file-name" id="lotteryName">未选择</span><button data-kind="lottery">选择音频</button></div>
+    <div class="status" id="status"></div>
+  </div>
+  <script>
+    const plugin = window.CyreneSoundEffects
+    const request = window.CyrenePlugin?.request
+    const state = { enabled: true, volume: 0.7, playbackMode: 'once', roller: null, card: null, lottery: null }
+    const $ = id => document.getElementById(id)
+    const show = message => { $('status').textContent = message; setTimeout(() => { $('status').textContent = '' }, 3200) }
+    async function load() {
+      if (!request) return show('插件通信尚未准备好，请刷新页面。')
+      const saved = await request('storage.read', { key: 'settings' })
+      Object.assign(state, saved || {})
+      $('enabled').checked = !!state.enabled
+      $('volume').value = Number(state.volume ?? .7)
+      $('volumeValue').textContent = `${Math.round(Number($('volume').value) * 100)}%`
+      $('playbackMode').value = state.playbackMode || 'once'
+      for (const kind of ['roller', 'card', 'lottery']) $(kind + 'Name').textContent = state[kind]?.name || '未选择'
+    }
+    async function save(next) {
+      Object.assign(state, next)
+      await request('storage.write', { key: 'settings', value: state })
+    }
+    $('enabled').addEventListener('change', () => save({ enabled: $('enabled').checked }))
+    $('volume').addEventListener('input', () => { $('volumeValue').textContent = `${Math.round(Number($('volume').value) * 100)}%`; save({ volume: Number($('volume').value) }) })
+    $('playbackMode').addEventListener('change', () => save({ playbackMode: $('playbackMode').value }))
+    document.querySelectorAll('button[data-kind]').forEach(button => button.addEventListener('click', async () => {
+      const kind = button.dataset.kind
+      const selected = await request('audio.select', { accept: 'audio/*' })
+      if (!selected) return
+      await save({ [kind]: selected })
+      $(kind + 'Name').textContent = selected.name
+      show('已保存音频设置')
+    }))
+    load()
+  </script>
+</body>
+</html>
