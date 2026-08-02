@@ -61,7 +61,10 @@ definePlugin({
   },
 
   async onEvent(event, payload) {
-    await readSettings()
+    if (event === PluginEvents.PLUGIN_STORAGE_CHANGED && payload?.key === 'settings') {
+      await readSettings()
+      return
+    }
     const kind = settings.playbackMode === 'each' ? ITEM_EVENT_AUDIO[event] : EVENT_AUDIO[event]
     if (!kind || !settings.enabled || !settings[kind]?.dataUrl) return
     await play(kind)
@@ -72,6 +75,7 @@ definePlugin({
 
   async deactivate() {
     request = null
+    settings = { ...DEFAULTS }
   }
 })
 
