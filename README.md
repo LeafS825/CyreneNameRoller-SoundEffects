@@ -1,6 +1,6 @@
 # 来点音效
 
-Cyrene2008 官方示例插件，版本 1.1.1，已使用 Plugin API 1.1 生命周期事件即时同步设置。
+Cyrene2008 官方示例插件，版本 1.2.0，已使用 Plugin API 1.2 生命周期事件即时同步设置。
 
 安装后会在「插件」Dock 页面中显示由宿主原生 Fluent 组件渲染的“音效”扩展页面，可以分别为随机点名、翻牌点名和抽奖选择本地音频，设置音量和播放逻辑。
 
@@ -18,3 +18,5 @@ npm run build
 ```
 
 本插件也是官方模板的实际应用示例。新插件建议从 [CyreneNameRoller Plugin Template](https://github.com/Cyrene2008/CyreneNameRoller-Plugin-Template) 开始。
+
+1.2.0 同步宿主插件 SDK 1.2，兼容通用宿主能力发现、资源查询和宿主管理事务模型；音效插件本身仍只使用音频、存储和结果事件权限。
