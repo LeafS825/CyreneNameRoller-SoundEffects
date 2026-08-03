@@ -1,8 +1,12 @@
 name: Release plugin
 
 on:
-  push:
-    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '请输入版本号（如 v1.2.3）'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -19,9 +23,26 @@ jobs:
       - run: npm ci
       - run: npm run validate
       - run: npm run build
+
+      # 动态设置环境变量，供后续步骤使用
+      - name: Set version from input
+        run: echo "RELEASE_VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+
+      # 验证输入的版本号是否与 manifest.json 一致
       - name: Verify tag version
-        run: test "$GITHUB_REF_NAME" = "v$(node -p "require('./manifest.json').version")"
-      - run: gh release create "$GITHUB_REF_NAME" dist/*.cnrp --generate-notes
+        run: |
+          EXPECTED_VERSION="v$(node -p "require('./manifest.json').version")"
+          if [ "$RELEASE_VERSION" != "$EXPECTED_VERSION" ]; then
+            echo "❌ 版本不匹配！输入的是 $RELEASE_VERSION，但 manifest.json 中是 $EXPECTED_VERSION"
+            exit 1
+          fi
+
+      # 创建 Release（如果已存在则跳过或更新）
+      - name: Create or update release
+        run: |
+          # 先尝试删除旧的 Release（如果存在）
+          gh release delete "$RELEASE_VERSION" --yes || true
+          # 再创建新的 Release
+          gh release create "$RELEASE_VERSION" dist/*.cnrp --generate-notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
