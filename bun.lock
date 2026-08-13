@@ -5,12 +5,12 @@
     "": {
       "name": "cyrene-name-roller-sound-effects",
       "devDependencies": {
-        "@cyrene2008/cyrene-name-roller": "file:vendor/cyrene-name-roller-plugin-sdk-1.0.1.tgz",
+        "@cyrene2008/cyrene-name-roller": "file:vendor/cyrene-name-roller-plugin-sdk-1.2.0.tgz",
       },
     },
   },
   "packages": {
-    "@cyrene2008/cyrene-name-roller": ["@cyrene2008/cyrene-name-roller@vendor/cyrene-name-roller-plugin-sdk-1.0.1.tgz", { "dependencies": { "esbuild": "^0.25.12", "javascript-obfuscator": "^5.5.0", "jszip": "^3.10.1" }, "bin": { "cnrp": "./bin/cnrp.mjs" } }, "sha512-qQeoEDVgyvUf86MrkcyOmWX9gcFlj/bFntkFX/PYZMzB2//qvN2PCzLs8jF+kSZAyWgMNtaz2Va+129gUe+exg=="],
+    "@cyrene2008/cyrene-name-roller": ["@cyrene2008/cyrene-name-roller@vendor/cyrene-name-roller-plugin-sdk-1.2.0.tgz", { "dependencies": { "esbuild": "^0.25.12", "javascript-obfuscator": "^5.5.0", "jszip": "^3.10.1" }, "bin": { "cnrp": "./bin/cnrp.mjs" } }, "sha512-OTObG8cUWcYrttlpomrJCoi4kI5o45ckN3ega3dLMQi8ztcJ9RNYZ53Gr2l5tsEJ2qRf5/56jgDQHl5csLvDJw=="],
 
     "@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.25.12", "", { "os": "aix", "cpu": "ppc64" }, "sha512-Hhmwd6CInZ3dwpuGTF8fJG6yoWmsToE+vYgD4nytZVxcu1ulHpUQRAB1UJ8+N1Am3Mz4+xOByoQoSZf4D+CpkA=="],
 
