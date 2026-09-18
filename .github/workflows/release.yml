@@ -16,12 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version-file: package.json
-      - run: bun install --frozen-lockfile
-      - run: bun run validate
-      - run: bun run build
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run validate
+      - run: npm run build
 
       # 动态设置环境变量，供后续步骤使用
       - name: Set version from input
